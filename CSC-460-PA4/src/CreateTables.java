@@ -13,8 +13,8 @@ import java.sql.Statement;
 
 public class CreateTables {
 	public static void main(String[] args) {
-		String username = "puffvu",    // Oracle DBMS username
-			   password = "a2137";     // Oracle DBMS password
+		String username = "kyelse",    // Oracle DBMS username
+			   password = "a2124";     // Oracle DBMS password
 			
 			
 			if (args.length == 2) {    // get username/password from cmd line args
@@ -35,13 +35,14 @@ public class CreateTables {
 			userTable(dbconn);
 			licenseTable(dbconn);
 			vehicleTable(dbconn);
+			jobTable(dbconn);
+			departmentTable(dbconn);
 			employeeTable(dbconn);
-			appointmentTable(dbconn);
 			serviceTable(dbconn);
 			stateIDTable(dbconn);
 			permitTable(dbconn);
-			jobTable(dbconn);
-			departmentTable(dbconn);
+			appointmentTable(dbconn);
+			logTable(dbconn);
 			
 			System.out.println("all tables were created");
 		
@@ -76,7 +77,7 @@ public class CreateTables {
 				}
 				
 				
-				    // make and return a database connection to the user's
+				    // make and return a database connection to the client's
 				    // Oracle database
 				
 				Connection dbconn = null;
@@ -99,30 +100,31 @@ public class CreateTables {
 	}
 	
 	/*
-	 *  This function will create user table in the Oracle database
+	 *  This function will create client table in the Oracle database
 	 *  
 	 */
 	private static void userTable(Connection dbconn) {
 		Statement stmt = null;
 		
 		StringBuilder query = new StringBuilder();
-		query.append("CREATE table USER ( ");
-		query.append("username varchar2(64) UNIQUE, ");
+		query.append("CREATE table client ( ");
+		query.append("username varchar2(64), ");
 		query.append("DOB DATE, ");
 		query.append("fname varchar2(64), ");
 		query.append("lname varchar2(64), ");
 		query.append("primary key (username))");
-		
+		System.out.println(query.toString());
 		// Grant access to outside
-		String special = "GRANT SELECT ON USER TO PUBLIC";
+		String special = "GRANT SELECT ON client TO PUBLIC";
 		try {
 			stmt = dbconn.createStatement();
-            stmt.executeQuery(query.toString());
-            System.out.println("create USER table successfully");
-		    stmt.executeQuery(special);
+            stmt.executeUpdate(query.toString());
+            System.out.println("create client table successfully");
+		    stmt.executeUpdate(special);
+		    stmt.close();
 		} catch (SQLException e) {
             System.err.println("*** SQLException:  "
-                + "Could not fetch query results. (Error happen when create USER table)");
+                + "Could not fetch query results. (Error happen when create client table)");
             System.err.println("\tMessage:   " + e.getMessage());
             System.err.println("\tSQLState:  " + e.getSQLState());
             System.err.println("\tErrorCode: " + e.getErrorCode());
@@ -138,23 +140,25 @@ public class CreateTables {
 		Statement stmt = null;
 		
 		StringBuilder query = new StringBuilder();
-		query.append("CREATE table LICENSE ( ");
+		query.append("CREATE table license ( ");
 		query.append("username varchar2(64), ");
 		query.append("issuedDate DATE, ");
 		query.append("LicenseID INTEGER, ");
-		query.append("primary key (LicenseID) ");
-		query.append("FOREIGN KEY (username) REFERENCES user UNIQUE"
-				+ "ON DELETE CASCADE ON UPDATE CASCADE");
+		query.append("primary key (LicenseID), ");
+		query.append("FOREIGN KEY (username) REFERENCES client(username) "
+				+ "ON DELETE CASCADE ,  "
+				+ "UNIQUE (username)) ");
 		
 		
-		
+		System.out.println(query.toString());
 		// Grant access to outside
-		String special = "GRANT SELECT ON LICENSE TO PUBLIC";
+		String special = "GRANT SELECT ON license TO PUBLIC";
 		try {
 			stmt = dbconn.createStatement();
-            stmt.executeQuery(query.toString());
+            stmt.executeUpdate(query.toString());
             System.out.println("create LICENSE table successfully");
-		    stmt.executeQuery(special);
+		    stmt.executeUpdate(special);
+		    stmt.close();
 		} catch (SQLException e) {
             System.err.println("*** SQLException:  "
                 + "Could not fetch query results. (Error happen when create LICENSE table)");
@@ -172,23 +176,24 @@ public class CreateTables {
 		Statement stmt = null;
 		
 		StringBuilder query = new StringBuilder();
-		query.append("CREATE table VEHICLE ( ");
+		query.append("CREATE table vehicle ( ");
 		query.append("username varchar2(64), ");
 		query.append("registration_number varchar2(64), ");
 		query.append("issuedDate DATE, ");
 		query.append("make varchar2(64), ");
 		query.append("color varchar2(64), ");
-		query.append("primary key (registration_number) ");
-		query.append("FOREIGN KEY (username) REFERENCES user "
-				+ "ON DELETE CASCADE ON UPDATE CASCADE) ");
-		
+		query.append("primary key (registration_number), ");
+		query.append("FOREIGN KEY (username) REFERENCES client(username) "
+				+ "ON DELETE CASCADE ) ");
+		System.out.println(query.toString());
 		// Grant access to outside
-		String special = "GRANT SELECT ON VEHICLE TO PUBLIC";
+		String special = "GRANT SELECT ON vehicle TO PUBLIC";
 		try {
 			stmt = dbconn.createStatement();
-            stmt.executeQuery(query.toString());
-            System.out.println("create VEHICLE table successfully");
-		    stmt.executeQuery(special);
+            stmt.executeUpdate(query.toString());
+            System.out.println("create vehicle table successfully");
+		    stmt.executeUpdate(special);
+		    stmt.close();
 		} catch (SQLException e) {
             System.err.println("*** SQLException:  "
                 + "Could not fetch query results. (Error happen when create VEHICLE table)");
@@ -213,17 +218,18 @@ public class CreateTables {
 		query.append("lname varchar2(64), ");
 		query.append("EmployeeID Integer, ");
 		query.append("primary key (EmployeeID), ");
-		query.append("FOREIGN KEY (jobID) REFERENCES job ON UPDATE CASCADE, "
-				+ "FOREIGN KEY (departmentNumber) REFERENCES department ON UPDATE CASCADE )");
+		query.append("FOREIGN KEY (job_id) REFERENCES job(job_id) , "
+				+ "FOREIGN KEY (departmentNumber) REFERENCES department(departmentNumber)  )");
 		
-		
+		System.out.println(query.toString());
 		// Grant access to outside
-		String special = "GRANT SELECT ON EMPLOYEE TO PUBLIC";
+		String special = "GRANT SELECT ON employee TO PUBLIC";
 		try {
 			stmt = dbconn.createStatement();
-            stmt.executeQuery(query.toString());
-            System.out.println("create EMPLOYEE table successfully");
-		    stmt.executeQuery(special);
+            stmt.executeUpdate(query.toString());
+            System.out.println("create employee table successfully");
+		    stmt.executeUpdate(special);
+		    stmt.close();
 		} catch (SQLException e) {
             System.err.println("*** SQLException:  "
                 + "Could not fetch query results. (Error happen when create employee table)");
@@ -247,27 +253,22 @@ public class CreateTables {
 		query.append("EmployeeID Integer, ");
 		query.append("service_type varchar2(64), ");
 		query.append("success Integer, "); // 0 true, 1 false 
-		query.append("primary key (username, time)), ");
-		query.append("FOREIGN KEY (username) REFERENCES user "
-				+ "ON DELETE CASCADE ON UPDATE CASCADE, ");
-		query.append("FOREIGN KEY (EmployeeID) REFERENCES employee "
-				+ "ON UPDATE CASCADE ON DELETE CASCADE, "); 
-		query.append("FOREIGN KEY (service_type) REFERENCES service "
-				+ "ON UPDATE CASCADE, "); // no reason to delete a service
-		query.append("CONSTRAINT TimeConflict "
-				+ "CHECK (NOT EXISTS ( SELECT * "
-				+ "FROM appointment a "
-				+ "WHERE a.timeFrom = appointment.timeFrom AND "
-				+ "a.username = appointment.username)))");
+		query.append("primary key (username, time), ");
+		query.append("FOREIGN KEY (username) REFERENCES client(username) "
+				+ "ON DELETE CASCADE , ");
+		query.append("FOREIGN KEY (EmployeeID) REFERENCES employee(employeeID) "
+				+ " ON DELETE CASCADE, "); 
+		query.append("FOREIGN KEY (service_type) REFERENCES service(service_type))");
 		
-		
+		System.out.println(query.toString());
 		// Grant access to outside
-		String special = "GRANT SELECT ON APPOINTMENT TO PUBLIC";
+		String special = "GRANT SELECT ON appointment TO PUBLIC";
 		try {
 			stmt = dbconn.createStatement();
-            stmt.executeQuery(query.toString());
-            System.out.println("create APPOINTMENT table successfully");
-		    stmt.executeQuery(special);
+            stmt.executeUpdate(query.toString());
+            System.out.println("create appointment table successfully");
+		    stmt.executeUpdate(special);
+		    stmt.close();
 		} catch (SQLException e) {
             System.err.println("*** SQLException:  "
                 + "Could not fetch query results. (Error happen when create APPOINTMENT table)");
@@ -286,18 +287,19 @@ public class CreateTables {
 		
 		StringBuilder query = new StringBuilder();
 		query.append("CREATE table service ( ");
-		query.append("service_type varchar2(64) UNIQUE, "); 
+		query.append("service_type varchar2(64), "); 
 		query.append("price integer, ");
 		query.append("expiry_length integer, ");
 		query.append("primary key (service_type))");
-		
+		System.out.println(query.toString());
 		// Grant access to outside
-		String special = "GRANT SELECT ON SERVICE TO PUBLIC";
+		String special = "GRANT SELECT ON service TO PUBLIC";
 		try {
 			stmt = dbconn.createStatement();
-            stmt.executeQuery(query.toString());
-            System.out.println("create SERVICE table successfully");
-		    stmt.executeQuery(special);
+            stmt.executeUpdate(query.toString());
+            System.out.println("create service table successfully");
+		    stmt.executeUpdate(special);
+		    stmt.close();
 		} catch (SQLException e) {
             System.err.println("*** SQLException:  "
                 + "Could not fetch query results. (Error happen when create SERVICE table)");
@@ -320,16 +322,18 @@ public class CreateTables {
 		query.append("issuedDate DATE, ");
 		query.append("id INTEGER, ");
 		query.append("primary key (id),");
-		query.append("FOREIGN KEY (username) REFERENCES user UNIQUE "
-				+ "ON DELETE CASCADE ON UPDATE CASCADE, ");
-		
+		query.append("FOREIGN KEY (username) REFERENCES client(username)  "
+				+ "ON DELETE CASCADE , "
+				+ "UNIQUE (username) ) ");
+		System.out.println(query.toString());
 		// Grant access to outside
 		String special = "GRANT SELECT ON stateID TO PUBLIC";
 		try {
 			stmt = dbconn.createStatement();
-            stmt.executeQuery(query.toString());
+            stmt.executeUpdate(query.toString());
             System.out.println("create stateID table successfully");
-		    stmt.executeQuery(special);
+		    stmt.executeUpdate(special);
+		    stmt.close();
 		} catch (SQLException e) {
             System.err.println("*** SQLException:  "
                 + "Could not fetch query results. (Error happen when create STATEID table)");
@@ -347,21 +351,22 @@ public class CreateTables {
 		Statement stmt = null;
 		
 		StringBuilder query = new StringBuilder();
-		query.append("CREATE table PERMIT ( ");
+		query.append("CREATE table permit ( ");
 		query.append("username varchar2(64), ");
 		query.append("issuedDate DATE, ");
 		query.append("id INTEGER, ");
 		query.append("primary key (id), ");
-		query.append("FOREIGN KEY (username) REFERENCES user "
-				+ "ON DELETE CASCADE ON UPDATE CASCADE, ");
-		
+		query.append("FOREIGN KEY (username) REFERENCES client(username) "
+				+ "ON DELETE CASCADE ) ");
+		System.out.println(query.toString());
 		// Grant access to outside
-		String special = "GRANT SELECT ON PERMIT TO PUBLIC";
+		String special = "GRANT SELECT ON permit TO PUBLIC";
 		try {
 			stmt = dbconn.createStatement();
-            stmt.executeQuery(query.toString());
-            System.out.println("create PERMIT table successfully");
-		    stmt.executeQuery(special);
+            stmt.executeUpdate(query.toString());
+            System.out.println("create permit table successfully");
+		    stmt.executeUpdate(special);
+		    stmt.close();
 		} catch (SQLException e) {
             System.err.println("*** SQLException:  "
                 + "Could not fetch query results. (Error happen when create PERMIT table)");
@@ -379,19 +384,21 @@ public class CreateTables {
 		Statement stmt = null;
 		
 		StringBuilder query = new StringBuilder();
-		query.append("CREATE table JOB ( ");
+		query.append("CREATE table job ( ");
 		query.append("job_id integer, ");
 		query.append("job_type VARCHAR2(64), ");
-		query.append("salary NUMBER(8, 2), ");
-		query.append("primary key (id))");
-		
+		query.append("job_title VARCHAR2(64), ");
+		query.append("salary NUMBER(8, 2), ");	
+		query.append("primary key (job_id)) ");
+		System.out.println(query.toString());
 		// Grant access to outside
 		String special = "GRANT SELECT ON job TO PUBLIC";
 		try {
 			stmt = dbconn.createStatement();
-            stmt.executeQuery(query.toString());
+            stmt.executeUpdate(query.toString());
             System.out.println("create job table successfully");
-		    stmt.executeQuery(special);
+		    stmt.executeUpdate(special);
+		    stmt.close();
 		} catch (SQLException e) {
             System.err.println("*** SQLException:  "
                 + "Could not fetch query results. (Error happen when create job table)");
@@ -412,15 +419,16 @@ public class CreateTables {
 		query.append("CREATE table department ( ");
 		query.append("departmentNumber integer, ");
 		query.append("name VARCHAR2(64), ");
-		query.append("primary key (number))");
-		
+		query.append("primary key (departmentNumber))");
+		System.out.println(query.toString());
 		// Grant access to outside
 		String special = "GRANT SELECT ON department TO PUBLIC";
 		try {
 			stmt = dbconn.createStatement();
-            stmt.executeQuery(query.toString());
+            stmt.executeUpdate(query.toString());
             System.out.println("create department table successfully");
-		    stmt.executeQuery(special);
+		    stmt.executeUpdate(special);
+		    stmt.close();
 		} catch (SQLException e) {
             System.err.println("*** SQLException:  "
                 + "Could not fetch query results. (Error happen when create department table)");
@@ -446,19 +454,21 @@ public class CreateTables {
 		query.append("time DATE NOT NULL, ");
 		query.append("EmployeeID Integer, ");
 		query.append("charge Integer, "); 
-		query.append("primary key (username, time, employeeID)), ");
-		query.append("FOREIGN KEY (username) REFERENCES user "
-				+ "ON DELETE CASCADE ON UPDATE CASCADE, ");
-		query.append("FOREIGN KEY (EmployeeID) REFERENCES employee "
-				+ "ON UPDATE CASCADE ON DELETE CASCADE) "); 
-
+		query.append("primary key (username, time, employeeID), ");
+		query.append("FOREIGN KEY (username) REFERENCES client(username) "
+				+ "ON DELETE CASCADE , ");
+		query.append("FOREIGN KEY (EmployeeID) REFERENCES employee(EmployeeID) "
+				+ " ON DELETE CASCADE, "); 
+		query.append("FOREIGN KEY (username, time) REFERENCES appointment(username, time))");
+		System.out.println(query.toString());
 		// Grant access to outside
-		String special = "GRANT SELECT ON department TO PUBLIC";
+		String special = "GRANT SELECT ON transLog TO PUBLIC";
 		try {
 			stmt = dbconn.createStatement();
-            stmt.executeQuery(query.toString());
-            System.out.println("create department table successfully");
-		    stmt.executeQuery(special);
+            stmt.executeUpdate(query.toString());
+            System.out.println("create transLog table successfully");
+		    stmt.executeUpdate(special);
+		    stmt.close();
 		} catch (SQLException e) {
             System.err.println("*** SQLException:  "
                 + "Could not fetch query results. (Error happen when create department table)");
