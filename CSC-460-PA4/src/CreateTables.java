@@ -107,7 +107,7 @@ public class CreateTables {
 		
 		StringBuilder query = new StringBuilder();
 		query.append("CREATE table USER ( ");
-		query.append("username varchar2(64), ");
+		query.append("username varchar2(64) UNIQUE, ");
 		query.append("DOB DATE, ");
 		query.append("fname varchar2(64), ");
 		query.append("lname varchar2(64), ");
@@ -142,7 +142,11 @@ public class CreateTables {
 		query.append("username varchar2(64), ");
 		query.append("issuedDate DATE, ");
 		query.append("LicenseID INTEGER, ");
-		query.append("primary key (LicenseID))");
+		query.append("primary key (LicenseID) ");
+		query.append("FOREIGN KEY (username) REFERENCES user UNIQUE"
+				+ "ON DELETE CASCADE ON UPDATE CASCADE");
+		
+		
 		
 		// Grant access to outside
 		String special = "GRANT SELECT ON LICENSE TO PUBLIC";
@@ -174,7 +178,9 @@ public class CreateTables {
 		query.append("issuedDate DATE, ");
 		query.append("make varchar2(64), ");
 		query.append("color varchar2(64), ");
-		query.append("primary key (registration_number))");
+		query.append("primary key (registration_number) ");
+		query.append("FOREIGN KEY (username) REFERENCES user "
+				+ "ON DELETE CASCADE ON UPDATE CASCADE) ");
 		
 		// Grant access to outside
 		String special = "GRANT SELECT ON VEHICLE TO PUBLIC";
@@ -201,12 +207,15 @@ public class CreateTables {
 		
 		StringBuilder query = new StringBuilder();
 		query.append("CREATE table employee ( ");
-		query.append("jobID integer, ");
+		query.append("job_id integer, ");
 		query.append("departmentNumber integer, ");
 		query.append("fname varchar2(64), ");
 		query.append("lname varchar2(64), ");
 		query.append("EmployeeID Integer, ");
-		query.append("primary key (EmployeeID))");
+		query.append("primary key (EmployeeID), ");
+		query.append("FOREIGN KEY (jobID) REFERENCES job ON UPDATE CASCADE, "
+				+ "FOREIGN KEY (departmentNumber) REFERENCES department ON UPDATE CASCADE )");
+		
 		
 		// Grant access to outside
 		String special = "GRANT SELECT ON EMPLOYEE TO PUBLIC";
@@ -234,11 +243,23 @@ public class CreateTables {
 		StringBuilder query = new StringBuilder();
 		query.append("CREATE table appointment ( ");
 		query.append("username varchar2(64), ");
-		query.append("time TIMESTAMP, ");
+		query.append("time DATE NOT NULL, ");
 		query.append("EmployeeID Integer, ");
 		query.append("service_type varchar2(64), ");
 		query.append("success Integer, "); // 0 true, 1 false 
-		query.append("primary key (username, time))");
+		query.append("primary key (username, time)), ");
+		query.append("FOREIGN KEY (username) REFERENCES user "
+				+ "ON DELETE CASCADE ON UPDATE CASCADE, ");
+		query.append("FOREIGN KEY (EmployeeID) REFERENCES employee "
+				+ "ON UPDATE CASCADE ON DELETE CASCADE, "); 
+		query.append("FOREIGN KEY (service_type) REFERENCES service "
+				+ "ON UPDATE CASCADE, "); // no reason to delete a service
+		query.append("CONSTRAINT TimeConflict "
+				+ "CHECK (NOT EXISTS ( SELECT * "
+				+ "FROM appointment a "
+				+ "WHERE a.timeFrom = appointment.timeFrom AND "
+				+ "a.username = appointment.username)))");
+		
 		
 		// Grant access to outside
 		String special = "GRANT SELECT ON APPOINTMENT TO PUBLIC";
@@ -265,10 +286,10 @@ public class CreateTables {
 		
 		StringBuilder query = new StringBuilder();
 		query.append("CREATE table service ( ");
-		query.append("type varchar2(64), "); 
+		query.append("service_type varchar2(64) UNIQUE, "); 
 		query.append("price integer, ");
 		query.append("expiry_length integer, ");
-		query.append("primary key (type))");
+		query.append("primary key (service_type))");
 		
 		// Grant access to outside
 		String special = "GRANT SELECT ON SERVICE TO PUBLIC";
@@ -298,7 +319,9 @@ public class CreateTables {
 		query.append("username varchar2(64), ");
 		query.append("issuedDate DATE, ");
 		query.append("id INTEGER, ");
-		query.append("primary key (id))");
+		query.append("primary key (id),");
+		query.append("FOREIGN KEY (username) REFERENCES user UNIQUE "
+				+ "ON DELETE CASCADE ON UPDATE CASCADE, ");
 		
 		// Grant access to outside
 		String special = "GRANT SELECT ON stateID TO PUBLIC";
@@ -328,7 +351,9 @@ public class CreateTables {
 		query.append("username varchar2(64), ");
 		query.append("issuedDate DATE, ");
 		query.append("id INTEGER, ");
-		query.append("primary key (id))");
+		query.append("primary key (id), ");
+		query.append("FOREIGN KEY (username) REFERENCES user "
+				+ "ON DELETE CASCADE ON UPDATE CASCADE, ");
 		
 		// Grant access to outside
 		String special = "GRANT SELECT ON PERMIT TO PUBLIC";
@@ -355,8 +380,8 @@ public class CreateTables {
 		
 		StringBuilder query = new StringBuilder();
 		query.append("CREATE table JOB ( ");
-		query.append("id integer, ");
-		query.append("type VARCHAR2(64), ");
+		query.append("job_id integer, ");
+		query.append("job_type VARCHAR2(64), ");
 		query.append("salary NUMBER(8, 2), ");
 		query.append("primary key (id))");
 		
@@ -385,10 +410,48 @@ public class CreateTables {
 		
 		StringBuilder query = new StringBuilder();
 		query.append("CREATE table department ( ");
-		query.append("number integer, ");
+		query.append("departmentNumber integer, ");
 		query.append("name VARCHAR2(64), ");
 		query.append("primary key (number))");
 		
+		// Grant access to outside
+		String special = "GRANT SELECT ON department TO PUBLIC";
+		try {
+			stmt = dbconn.createStatement();
+            stmt.executeQuery(query.toString());
+            System.out.println("create department table successfully");
+		    stmt.executeQuery(special);
+		} catch (SQLException e) {
+            System.err.println("*** SQLException:  "
+                + "Could not fetch query results. (Error happen when create department table)");
+            System.err.println("\tMessage:   " + e.getMessage());
+            System.err.println("\tSQLState:  " + e.getSQLState());
+            System.err.println("\tErrorCode: " + e.getErrorCode());
+            System.exit(-1);
+		}
+		
+	}
+	
+	/*
+	 * Create the log transaction table. The primary key are the foreign key to the appointment 
+	 * table since we have to keep 1:1 relationship to each appointment. This is just in order 
+	 * to match from what appointment has. 
+	 */
+	private static void logTable(Connection dbconn) {
+		Statement stmt = null;
+		
+		StringBuilder query = new StringBuilder();
+		query.append("CREATE table transLog ( ");
+		query.append("username varchar2(64), ");
+		query.append("time DATE NOT NULL, ");
+		query.append("EmployeeID Integer, ");
+		query.append("charge Integer, "); 
+		query.append("primary key (username, time, employeeID)), ");
+		query.append("FOREIGN KEY (username) REFERENCES user "
+				+ "ON DELETE CASCADE ON UPDATE CASCADE, ");
+		query.append("FOREIGN KEY (EmployeeID) REFERENCES employee "
+				+ "ON UPDATE CASCADE ON DELETE CASCADE) "); 
+
 		// Grant access to outside
 		String special = "GRANT SELECT ON department TO PUBLIC";
 		try {
