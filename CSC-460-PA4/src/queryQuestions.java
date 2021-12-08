@@ -56,7 +56,8 @@ public class queryQuestions {
                  
                  option = "options";
 			} else if (option.equalsIgnoreCase("2")) {
-				
+				secondQuery(dbconn);
+				option = "options";
 			} else if (option.equalsIgnoreCase("4")) {
 				 System.out.println("type in registration number");
                  String number = input.nextLine();
@@ -90,6 +91,78 @@ public class queryQuestions {
 			return true;
 		} else {
 			return false;
+		}
+	}
+	
+	/*
+	 * Second Query
+	 */
+	private static void secondQuery(Connection dbconn) {
+		String[] types = new String[] {"Permit", "Licence", "Vehicle Registration", "State ID"};
+		for (String type: types) {
+			String query = "select count(*) from appointment where time > to_date('10-31-2021','MM-DD-YYYY')"
+	                + " AND  time < to_date('12-01-2021','MM-DD-YYYY')"
+	                + " AND type='" + type + "'";
+	
+			Statement stmt = null;
+			ResultSet answer = null;
+			
+			try {
+			
+			stmt = dbconn.createStatement();
+			answer = stmt.executeQuery(query);
+			
+			if (answer != null) {
+			answer.next();
+			System.out.println("Number of appointment related to" + type + ": " + answer.getInt("COUNT(*)"));
+			}
+			System.out.println();
+			
+			// Shut down the connection to the DBMS.
+			
+			stmt.close();
+			
+			} catch (SQLException e) {
+			
+			System.err.println("*** SQLException:  "
+			    + "Could not fetch query results.");
+			System.err.println("\tMessage:   " + e.getMessage());
+			System.err.println("\tSQLState:  " + e.getSQLState());
+			System.err.println("\tErrorCode: " + e.getErrorCode());
+			System.exit(-1);
+			
+			}
+			
+			stmt = null;
+			answer = null;
+			query += " AND success = 0";
+			try {
+				
+				stmt = dbconn.createStatement();
+				answer = stmt.executeQuery(query);
+				
+				if (answer != null) {
+				answer.next();
+				System.out.println("Number of success appointment related to" + type + ": " + answer.getInt("COUNT(*)"));
+				}
+				System.out.println();
+				
+				// Shut down the connection to the DBMS.
+				
+				stmt.close();
+				
+			} catch (SQLException e) {
+				
+				System.err.println("*** SQLException:  "
+				    + "Could not fetch query results.");
+				System.err.println("\tMessage:   " + e.getMessage());
+				System.err.println("\tSQLState:  " + e.getSQLState());
+				System.err.println("\tErrorCode: " + e.getErrorCode());
+				System.exit(-1);
+				
+			}
+			
+			
 		}
 	}
 	
