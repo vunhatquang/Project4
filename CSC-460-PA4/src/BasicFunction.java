@@ -22,7 +22,6 @@ import java.text.SimpleDateFormat;
 import java.util.Scanner;
 
 public class BasicFunction {
-
 	/*
 	 * This function will take in the scanner from the main menu that call it and
 	 * use the scanner to work with JDBC
@@ -104,6 +103,7 @@ public class BasicFunction {
 					changeStateID(input, dbconn);
 					break;
 				}
+				option = "options";
 			}
 		}
 	}
@@ -138,7 +138,7 @@ public class BasicFunction {
 		try {
 			stmt = dbconn.createStatement();
 			stmt.executeUpdate("DELETE from license WHERE username = '" + username + "'");
-			stmt.executeUpdate("INSERT INTO license value('" + username + "', '" + time + "', " + license + "'");
+			stmt.executeUpdate("INSERT INTO license(username, time, license) values('" + username + "', '" + time + "', " + license + "'");
 			System.out.println("Add successfully");
 			stmt.close();
 
@@ -186,7 +186,7 @@ public class BasicFunction {
 		try {
 			stmt = dbconn.createStatement();
 			stmt.executeUpdate("DELETE from vehicle WHERE registration number = '" + rnum + "'");
-			stmt.executeUpdate("INSERT INTO vehicle value('" + username + "', '" + rnum + "', '" + time + "', '" + make
+			stmt.executeUpdate("INSERT INTO vehicle(username, rnum, time, make, color) values('" + username + "', '" + rnum + "', '" + time + "', '" + make
 					+ "', '" + color + "'");
 			System.out.println("Add successfully");
 			// Shut down the connection to the DBMS.
@@ -229,7 +229,7 @@ public class BasicFunction {
 		try {
 			stmt = dbconn.createStatement();
 			stmt.executeUpdate("DELETE from permit WHERE username = '" + username + "'");
-			stmt.executeUpdate("INSERT INTO permit value('" + username + "', '" + time + "', " + permit + "'");
+			stmt.executeUpdate("INSERT INTO permit(username, time, permit) values('" + username + "', '" + time + "', " + permit + "'");
 			System.out.println("Add successfully");
 			stmt.close();
 
@@ -273,7 +273,7 @@ public class BasicFunction {
 		try {
 			stmt = dbconn.createStatement();
 			stmt.executeUpdate("DELETE from permit WHERE username = '" + username + "'");
-			stmt.executeUpdate("INSERT INTO permit value('" + username + "', '" + time + "', " + stateID + "'");
+			stmt.executeUpdate("INSERT INTO permit(username, time, stateID) values('" + username + "', '" + time + "', " + stateID + "'");
 			System.out.println("Add successfully");
 			stmt.close();
 
@@ -475,7 +475,9 @@ public class BasicFunction {
 			String fname = input.nextLine();
 			System.out.print("Please type in the Last Name: ");
 			String lname = input.nextLine();
-			String query = "INSERT INTO client value ('" + username + "'," + "'" + fname + "'," + "'" + lname + "')";
+			String query = "INSERT INTO client(username, dob, fname, lname) values ('" + username + "'," + "'" + dob + "',"
+					+ "'" + fname + "'," + "'" + lname + "')";
+			System.out.println(query);
 			stmt.executeUpdate(query);
 			System.out.println("Add successfully");
 			stmt.close();
@@ -530,7 +532,7 @@ public class BasicFunction {
 			String fname = input.nextLine();
 			System.out.print("Please type in the Last Name: ");
 			String lname = input.nextLine();
-			String query = "INSERT INTO employee value ('" + eid + "'," + "'" + jid + "'," + "'" + dno + "'," + "'"
+			String query = "INSERT INTO employee values ('" + eid + "'," + "'" + jid + "'," + "'" + dno + "'," + "'"
 					+ fname + "'," + "'" + lname + "')";
 			stmt.executeUpdate(query);
 			System.out.println("Add successfully");
@@ -592,7 +594,7 @@ public class BasicFunction {
 				System.out.println("The service does not exist");
 				return;
 			}
-			String query = "INSERT INTO appointment value ('" + username + "'," + "'" + time + "'," + "'" + eid + "',"
+			String query = "INSERT INTO appointment(username, time, eid, service, success, process) values ('" + username + "'," + "'" + time + "'," + "'" + eid + "',"
 					+ "'" + service + "'," + "'" + "0" + "'," + "0" + "')";
 			stmt.executeUpdate(query);
 			System.out.println("Add successfully");
@@ -637,7 +639,7 @@ public class BasicFunction {
 			if (isInt(price) == false || isInt(expiry) == false) {
 				System.out.println("Please type only whole number for the price and the expiry length");
 			}
-			String query = "INSERT INTO service value ('" + service + "'," + "'" + price + "'," + "'" + expiry + "')";
+			String query = "INSERT INTO service(service, price, expiry) values ('" + service + "'," + "'" + price + "'," + "'" + expiry + "')";
 			stmt.executeUpdate(query);
 			System.out.println("Add service successfully");
 			// Shut down the connection to the DBMS.
@@ -738,6 +740,7 @@ public class BasicFunction {
 			String query = "UPDATE employee set job_id = '" + jid + "', departmentNumber = " + "'" + dno
 					+ "', fname =  " + "'" + fname + "', lname = " + "'" + lname + "' WHERE employee.employeeID = '"
 					+ eid + "'";
+			System.out.println(query);
 			stmt.executeUpdate(query);
 			System.out.println("Add successfully");
 
@@ -833,16 +836,18 @@ public class BasicFunction {
 				return;
 			}
 			if (process.equals("1")) {
-				String query = "INSERT INTO logs value ('" + username + "', '" + newTime + "', '" + eid + "', '" + price
-						+ "')";
+				String query = "INSERT INTO logs(username, newTime, eid, price) values ('" + username + "', '" + newTime + "', '" + eid + "', '"
+						+ price + "')";
 				stmt.executeUpdate(query);
 			}
 			// Deleting the old one and input the new with the new time available
 			String query = "DELETE from appointment WHERE username = '" + username + "' AND '" + "time = '" + time
 					+ "'";
+			System.out.println(query);
 			stmt.executeUpdate(query);
-			query = "INSERT INTO appointment value ('" + username + "'," + "'" + time + "'," + "'" + eid + "'," + "'"
+			query = "INSERT INTO appointment values ('" + username + "'," + "'" + time + "'," + "'" + eid + "'," + "'"
 					+ service + "'," + "'" + success + "'," + process + "')";
+			System.out.println(query);
 			stmt.executeUpdate(query);
 			System.out.println("Add successfully");
 
@@ -888,6 +893,7 @@ public class BasicFunction {
 			}
 			String query = "UPDATE service set price = '" + price + "', " + "expiry_length = '" + expiry
 					+ "' WHERE service_type = '" + service + "'";
+			System.out.println(query);
 			stmt.executeUpdate(query);
 			System.out.println("Add service successfully");
 			// Shut down the connection to the DBMS.
@@ -919,6 +925,7 @@ public class BasicFunction {
 		String queryCheck = "SELECT count(*) as checking, username as 'UserName', time as 'Appointment Tame', EmployeeID, service_type "
 				+ "as 'Service', Success, Process FROM appointment WHERE appointment.username = '" + username
 				+ "' AND appointment.time = '" + time + "'";
+		System.out.println(queryCheck);
 		try {
 			stmt = dbconn.createStatement();
 			answer = stmt.executeQuery(queryCheck);
@@ -959,8 +966,8 @@ public class BasicFunction {
 
 		Statement stmt = null;
 		ResultSet answer = null;
-		String queryCheck = "SELECT count(*) as checking, employeeID as 'EmployeeID', fname as 'First Name', "
-				+ "lname as 'Last Name' FROM employee WHERE employee.EmployeeId = '" + eid + "'";
+		String queryCheck = "SELECT count(*) as checking FROM employee WHERE employee.EmployeeId = '" + eid + "'";
+		System.out.println(queryCheck);
 		try {
 			stmt = dbconn.createStatement();
 			answer = stmt.executeQuery(queryCheck);
@@ -971,6 +978,8 @@ public class BasicFunction {
 					return false;
 				}
 			}
+			queryCheck = "SELECT employeeID as 'EmployeeID', fname as 'First Name', "
+					+ "lname as 'Last Name' FROM employee WHERE employee.EmployeeId = '" + eid + "'";
 			printQueryMetaData(answer);
 			while (answer.next()) {
 				System.out.printf("%-15s %-15s %-15s\n", answer.getInt("EmployeeID"), answer.getString("First Name"),
@@ -1000,8 +1009,8 @@ public class BasicFunction {
 
 		Statement stmt = null;
 		ResultSet answer = null;
-		String queryCheck = "SELECT count(*) as checking, username as 'UserName', fname as 'First Name', lname "
-				+ "as 'Last Name' FROM client WHERE client.username = '" + username + "'";
+		String queryCheck = "SELECT count(*) as checking FROM client WHERE client.username = '" + username + "'";
+		System.out.println(queryCheck);
 		try {
 			stmt = dbconn.createStatement();
 			answer = stmt.executeQuery(queryCheck);
@@ -1013,6 +1022,8 @@ public class BasicFunction {
 				}
 
 			}
+			queryCheck = "SELECT username as 'UserName', fname as 'First Name', lname "
+					+ "as 'Last Name' FROM client WHERE client.username = '" + username + "'";
 			printQueryMetaData(answer);
 			while (answer.next()) {
 				System.out.printf("%-15s %-15s %-15s\n", answer.getString("UserName"), answer.getString("First Name"),
@@ -1043,8 +1054,8 @@ public class BasicFunction {
 
 		Statement stmt = null;
 		ResultSet answer = null;
-		String queryCheck = "SELECT count(*) as checking, job_id as 'Job ID', job_type as 'Job Type', 'job_title'"
-				+ " as 'Title', salary as 'Salary' FROM job WHERE job.job_id = '" + job_ID + "'";
+		String queryCheck = "SELECT count(*) as checking FROM job WHERE job.job_id = '" + job_ID + "'";
+		System.out.println(queryCheck);
 		try {
 			stmt = dbconn.createStatement();
 			answer = stmt.executeQuery(queryCheck);
@@ -1055,6 +1066,8 @@ public class BasicFunction {
 					return false;
 				}
 			}
+			queryCheck = "SELECT job_id as 'Job ID', job_type as 'Job Type', 'job_title'"
+					+ " as 'Title', salary as 'Salary' FROM job WHERE job.job_id = '" + job_ID + "'";
 			printQueryMetaData(answer);
 			while (answer.next()) {
 				System.out.printf("%-15s %-15s %-15s %-15s\n", answer.getInt("Job ID"), answer.getString("Job Type"),
@@ -1087,8 +1100,9 @@ public class BasicFunction {
 
 		Statement stmt = null;
 		ResultSet answer = null;
-		String queryCheck = "SELECT count(*) as checking, departmentNumber as 'Department Number', name as "
-				+ "'Department Name' FROM department WHERE department.departmentNumber = '" + departmentNumber + "'";
+		String queryCheck = "SELECT count(*) as checking FROM department WHERE department.departmentNumber = '"
+				+ departmentNumber + "'";
+		System.out.println(queryCheck);
 		try {
 			stmt = dbconn.createStatement();
 			answer = stmt.executeQuery(queryCheck);
@@ -1099,6 +1113,9 @@ public class BasicFunction {
 					return false;
 				}
 			}
+			queryCheck = "SELECT departmentNumber as 'Department Number', name as "
+					+ "'Department Name' FROM department WHERE department.departmentNumber = '" + departmentNumber
+					+ "'";
 			printQueryMetaData(answer);
 			while (answer.next()) {
 				System.out.printf("%-15s %-15s\n", answer.getInt("Department Number"),
@@ -1130,9 +1147,9 @@ public class BasicFunction {
 
 		Statement stmt = null;
 		ResultSet answer = null;
-		String queryCheck = "SELECT count(*) as checking, service_type as 'Service', price as 'Price', "
-				+ "expiry_length as 'Expiry Duration (year)' FROM service WHERE service.service_type = '" + service
+		String queryCheck = "SELECT count(*) as checking FROM service WHERE service.service_type = '" + service
 				+ "'";
+		System.out.println(queryCheck);
 		try {
 			stmt = dbconn.createStatement();
 			answer = stmt.executeQuery(queryCheck);
@@ -1143,6 +1160,9 @@ public class BasicFunction {
 					return false;
 				}
 			}
+			queryCheck = "SELECT service_type as 'Service', price as 'Price', "
+					+ "expiry_length as 'Expiry Duration (year)' FROM service WHERE service.service_type = '" + service
+					+ "'";
 			while (answer.next()) {
 				System.out.printf("%-15s %-15s %-15s\n", answer.getString("Service"), answer.getInt("Price"),
 						answer.getInt("Expiry Duration (year)"));
@@ -1188,14 +1208,14 @@ public class BasicFunction {
 	 * program to identify which format to use.
 	 * 
 	 * @param format
-	 * @param value
+	 * @param values
 	 * @return
 	 */
-	public static boolean isValidDate(String format, String value) {
-		SimpleDateFormat parsing = new SimpleDateFormat("dd/mm/yyyy");
+	public static boolean isValidDate(String format, String values) {
+		SimpleDateFormat parsing = new SimpleDateFormat("dd/MM/yyyy");
 		parsing.setLenient(false);
 		try {
-			parsing.parse(value);
+			parsing.parse(values);
 		} catch (Exception e) {
 			return false;
 		}
@@ -1223,7 +1243,12 @@ public class BasicFunction {
 	 * Check if useriput is valid
 	 */
 	private static boolean isOptionValid(String option) {
-		String[] valid = new String[] { "back", "options" }; // add more options here
+		String[] valid = new String[18]; // add more options here
+		valid[0] = "back";
+		valid[1] = "options";
+		for (int i = 2; i < 18; i++) {
+			valid[i] = String.valueOf(i - 1);
+		}
 		for (String op : valid) {
 			if (option.toLowerCase().equals(op))
 				return true;
