@@ -12,5 +12,9 @@ Member 1: Minh Tran
   - Work on normalization analysis
   - Work on self-designed query
 Member 2: Quang Vu
-- work with query code, create tables in JDBC, create text user interface, testing
-3. Quan Nguyen: create insertion, update, delete code, creates constrain in relations, testing 
+  - Work with query code
+  - Create tables in JDBC
+  - Create text user interface
+  - Testing
+Member 3: Quan Nguyen
+  - create insertion, update, delete code, creates constrain in relations, testing 
