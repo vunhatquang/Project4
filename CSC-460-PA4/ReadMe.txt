@@ -17,6 +17,7 @@ Member 2: Quang Vu
   - Create text user interface
   - Testing
 Member 3: Quan Nguyen
+  - Outline E-R diagram
   - Create insertion, update, delete code 
   - Create constrain in relations 
-  - testing 
+  - Testing 
