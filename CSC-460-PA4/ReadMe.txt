@@ -11,6 +11,7 @@ Member 1: Minh Tran
   - Help with creating table in JDBC
   - Work on normalization analysis
 Member 2: Quang Vu
+  - Outline E-R diagram
   - Work with query code
   - Create tables in JDBC
   - Create text user interface
