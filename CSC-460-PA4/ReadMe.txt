@@ -17,4 +17,6 @@ Member 2: Quang Vu
   - Create text user interface
   - Testing
 Member 3: Quan Nguyen
-  - create insertion, update, delete code, creates constrain in relations, testing 
+  - Create insertion, update, delete code 
+  - Create constrain in relations 
+  - testing 
