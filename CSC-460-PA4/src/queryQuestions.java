@@ -1,3 +1,7 @@
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Scanner;
 
 /*
@@ -13,7 +17,7 @@ public class queryQuestions {
 	 * This function will take in the scanner from the main menu that call it
 	 * and use the scanner to work with JDBC
 	 */
-	public static void selection(Scanner input) {
+	public static void selection(Scanner input, Connection dbconn) {
 		String option = "options";
 		while (!option.toLowerCase().equals("back")) {
 			if (!isOptionValid(option)) {
@@ -25,7 +29,7 @@ public class queryQuestions {
 				System.out.println("1. Display the user details whose Ids will expire given a date in format MM/DD/YYYY");
 				System.out.println("2. Count every type of appointment and check how many of them got successful their IDs");
 				System.out.println("3. Display the collected fee amount for every department for a given monthin the format MM/YYYY");
-				System.out.println("4. ...");
+				System.out.println("4. Display information about the owner of a car given its registration number");
 				System.out.println("back to back to the main menu");
 				option = input.nextLine();
 			} else if (option.equalsIgnoreCase("1")) {
@@ -50,6 +54,13 @@ public class queryQuestions {
                  
                  // add function here
                  
+                 option = "options";
+			} else if (option.equalsIgnoreCase("2")) {
+				
+			} else if (option.equalsIgnoreCase("4")) {
+				 System.out.println("type in registration number");
+                 String number = input.nextLine();
+                 fourthQuery(number, dbconn);
                  option = "options";
 			}
 		}
@@ -80,5 +91,46 @@ public class queryQuestions {
 		} else {
 			return false;
 		}
+	}
+	
+	/*
+	 * query number 4
+	 */
+	private static void fourthQuery(String number, Connection dbconn) {
+		String query = "SELECT client.fname, client.lname, license.LicenseID, vehicle.make, vehicle.color FROM vehicle, client, license"
+                + " WHERE client.username = license.username"
+                + " AND client.username = vehicle.username"
+                + " AND vehicle.registration_number = " + number;
+
+		Statement stmt = null;
+		ResultSet answer = null;
+		
+		try {
+		
+		stmt = dbconn.createStatement();
+		answer = stmt.executeQuery(query);
+		
+		if (answer != null) {
+		answer.next();
+		System.out.println("Name: " + answer.getString("fname") + " " +  answer.getString("lname") + ", License ID: " + answer.getInt("license") 
+						+ ", car make:" + answer.getString("make") + ", car color:" + answer.getString("color"));
+		}
+		System.out.println();
+		
+		// Shut down the connection to the DBMS.
+		
+		stmt.close();
+		
+		} catch (SQLException e) {
+		
+		System.err.println("*** SQLException:  "
+		    + "Could not fetch query results.");
+		System.err.println("\tMessage:   " + e.getMessage());
+		System.err.println("\tSQLState:  " + e.getSQLState());
+		System.err.println("\tErrorCode: " + e.getErrorCode());
+		System.exit(-1);
+		
+		}
+
 	}
 }
