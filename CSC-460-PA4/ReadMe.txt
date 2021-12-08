@@ -10,7 +10,6 @@ Member 1: Minh Tran
   - Documents (design.pdf and readme.txt)
   - Help with creating table in JDBC
   - Work on normalization analysis
-  - Work on self-designed query
 Member 2: Quang Vu
   - Work with query code
   - Create tables in JDBC
